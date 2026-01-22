@@ -56,11 +56,6 @@ This repository is a **public, code-free technical document** describing the arc
   - **Cloudinary** for image storage
   - **PayPal APIs** for payment verification
 
-Diagrams:
-- System overview: [`diagrams/system-overview.mmd`](./diagrams/system-overview.mmd)
-- Deployment view: [`diagrams/deployment.mmd`](./diagrams/deployment.mmd)
-- Data model (ERD): [`diagrams/erd.mmd`](./diagrams/erd.mmd)
-
 ---
 
 ## What I built (scope)
@@ -78,7 +73,6 @@ Diagrams:
 
 - Live site: https://underthewraps.com
 - Architecture + deployment docs in this repo
-- Screenshots can be added under [`/screenshots`](./screenshots) (sanitized / non-sensitive UI only)
 
 ---
 
