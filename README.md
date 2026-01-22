@@ -1,9 +1,9 @@
-# underthewraps.com — Production Publishing Platform (Case Study)
+# underthewraps.com — Production Publishing Platform
 
-**Live site:** https://underthewraps.com  
-**Source code:** Private (client-owned / production system)  
+**Live site:** https://underthewraps.com
+**Source code:** Private (client-owned / production system)
 
-This repository is a **public, code-free technical case study** describing the architecture, deployment, and engineering decisions behind a real production publishing platform I built and deployed for a client.
+This repository is a **public, code-free technical document** describing the architecture, deployment, and engineering decisions behind a real production publishing platform I built and deployed for a client.
 
 > Why no code here? The production repository is private to protect client IP and credentials. This repo exists to demonstrate **system design, deployment, security, and engineering depth**.
 
@@ -16,7 +16,7 @@ This repository is a **public, code-free technical case study** describing the a
 - **Media management:** image upload + metadata (alt text, titles) stored in **Cloudinary**
 - **Engagement:** likes + comments
 - **Payments:** **PayPal** checkout / donations with server-side verification and persisted payment records
-- **Contact + newsletter:** contact form delivery + subscriber capture (stored in Postgres)
+- **Contact:** contact form delivery
 
 ---
 
@@ -94,5 +94,5 @@ Diagrams:
 
 ## Contact
 
-**Upnit Banga**  
+**Upnit Banga**
 If you’d like to review the private repo in a screening call, I can walk through the codebase and architecture live.

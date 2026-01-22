@@ -1,0 +1,16 @@
+# System Overview
+
+```mermaid
+flowchart LR
+  U[User Browser] -->|HTTPS| N[Nginx on EC2]
+  N -->|/| C[Next.js Client (Docker)
+:3000]
+  N -->|/api/*| A[Express API (Docker)
+:5001]
+
+  A -->|Prisma| DB[(Supabase Postgres)]
+  A -->|Upload/Transform| CL[Cloudinary]
+  A -->|Verify/Execute| PP[PayPal APIs]
+
+  C -->|Fetch data| A
+```

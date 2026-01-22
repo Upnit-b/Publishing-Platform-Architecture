@@ -1,0 +1,958 @@
+openapi: 3.0.3
+info:
+  title: underthewraps.com Publishing Platform API
+  version: 1.0.0
+  description: Framework-agnostic OpenAPI contract for the production publishing platform
+    backend (Express + Prisma + Supabase).
+servers:
+- url: https://underthewraps.com/api
+  description: Production (behind Nginx)
+- url: http://localhost:4000/api
+  description: Local dev (Express)
+tags:
+- name: Auth
+- name: Articles
+- name: Taxonomy
+- name: Media
+- name: Engagement
+- name: Payments
+- name: Newsletter
+- name: Contact
+- name: Admin
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+          nullable: true
+        details:
+          type: object
+          additionalProperties: true
+          nullable: true
+      required:
+      - message
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum:
+          - USER
+          - ADMIN
+          - EDITOR
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - email
+      - role
+      - createdAt
+      - updatedAt
+    AuthResponse:
+      type: object
+      description: Auth response. In some deployments the JWT may be returned in-body;
+        in others it is set as an HttpOnly cookie.
+      properties:
+        token:
+          type: string
+          nullable: true
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - user
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - slug
+      - createdAt
+      - updatedAt
+    Subcategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        categoryId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - slug
+      - categoryId
+      - createdAt
+      - updatedAt
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        slug:
+          type: string
+        contentJson:
+          type: object
+          description: Editor.js content JSON
+        coverImageUrl:
+          type: string
+          format: uri
+        coverImageCaption:
+          type: string
+          nullable: true
+        coverImageAltText:
+          type: string
+          nullable: true
+        userId:
+          type: integer
+        author:
+          $ref: '#/components/schemas/User'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subcategory'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - title
+      - slug
+      - contentJson
+      - coverImageUrl
+      - userId
+      - createdAt
+      - updatedAt
+    ArticleListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+      required:
+      - items
+      - page
+      - pageSize
+      - total
+    CreateArticleRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        slug:
+          type: string
+          nullable: true
+          description: If omitted, server generates a unique slug
+        contentJson:
+          type: object
+        coverImageUrl:
+          type: string
+          format: uri
+        coverImageCaption:
+          type: string
+          nullable: true
+        coverImageAltText:
+          type: string
+          nullable: true
+        categoryIds:
+          type: array
+          items:
+            type: integer
+        subcategoryIds:
+          type: array
+          items:
+            type: integer
+      required:
+      - title
+      - contentJson
+      - coverImageUrl
+    UpdateArticleRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        slug:
+          type: string
+        contentJson:
+          type: object
+        coverImageUrl:
+          type: string
+          format: uri
+        coverImageCaption:
+          type: string
+          nullable: true
+        coverImageAltText:
+          type: string
+          nullable: true
+        categoryIds:
+          type: array
+          items:
+            type: integer
+        subcategoryIds:
+          type: array
+          items:
+            type: integer
+    CloudinaryUploadSignatureResponse:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+        signature:
+          type: string
+        apiKey:
+          type: string
+        cloudName:
+          type: string
+        folder:
+          type: string
+          nullable: true
+      required:
+      - timestamp
+      - signature
+      - apiKey
+      - cloudName
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        articleId:
+          type: integer
+        userId:
+          type: integer
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - articleId
+      - userId
+      - body
+      - createdAt
+    Like:
+      type: object
+      properties:
+        id:
+          type: integer
+        articleId:
+          type: integer
+        userId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - articleId
+      - userId
+      - createdAt
+    PaypalCreateOrderRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+          example: USD
+        purpose:
+          type: string
+          nullable: true
+          description: Optional label such as 'donation' or 'tip'
+        articleId:
+          type: integer
+          nullable: true
+      required:
+      - amount
+      - currency
+    PaypalCreateOrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+        approveUrl:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - orderId
+    PaypalCaptureRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+      required:
+      - orderId
+    PaypalCaptureResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        captureId:
+          type: string
+          nullable: true
+      required:
+      - status
+    Subscriber:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - email
+      - createdAt
+    ContactMessageRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        message:
+          type: string
+      required:
+      - name
+      - email
+      - message
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+security:
+- bearerAuth: []
+paths:
+  /health:
+    get:
+      security: []
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      security: []
+      summary: Login (no refresh tokens). Returns user + optional JWT token (or sets
+        HttpOnly cookie).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+              required:
+              - email
+              - password
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Logout (clears auth cookie if used).
+      responses:
+        '204':
+          description: Logged out
+  /auth/me:
+    get:
+      tags:
+      - Auth
+      summary: Get current user (requires auth).
+      responses:
+        '200':
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /articles:
+    get:
+      tags:
+      - Articles
+      security: []
+      summary: List articles (public feed).
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+        required: false
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 50
+        required: false
+      - name: q
+        in: query
+        schema:
+          type: string
+        required: false
+      - name: category
+        in: query
+        schema:
+          type: string
+          description: Category slug
+        required: false
+      - name: subcategory
+        in: query
+        schema:
+          type: string
+          description: Subcategory slug
+        required: false
+      responses:
+        '200':
+          description: Article list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleListResponse'
+  /admin/articles:
+    get:
+      tags:
+      - Admin
+      - Articles
+      summary: List articles for admin dashboard.
+      responses:
+        '200':
+          description: Article list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleListResponse'
+    post:
+      tags:
+      - Admin
+      - Articles
+      summary: Create article (admin).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateArticleRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /admin/articles/{id}:
+    get:
+      tags:
+      - Admin
+      - Articles
+      summary: Get article by id (admin).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Article
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags:
+      - Admin
+      - Articles
+      summary: Update article (admin).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateArticleRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Admin
+      - Articles
+      summary: Delete article (admin).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /articles/slug/{slug}:
+    get:
+      tags:
+      - Articles
+      security: []
+      summary: Get article by slug (public).
+      parameters:
+      - name: slug
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Article
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /categories:
+    get:
+      tags:
+      - Taxonomy
+      security: []
+      summary: List categories
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /admin/categories:
+    post:
+      tags:
+      - Admin
+      - Taxonomy
+      summary: Create category (admin).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+              - name
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+  /subcategories:
+    get:
+      tags:
+      - Taxonomy
+      security: []
+      summary: List subcategories
+      parameters:
+      - name: categoryId
+        in: query
+        schema:
+          type: integer
+        required: false
+      responses:
+        '200':
+          description: Subcategories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subcategory'
+  /admin/subcategories:
+    post:
+      tags:
+      - Admin
+      - Taxonomy
+      summary: Create subcategory (admin).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                categoryId:
+                  type: integer
+              required:
+              - name
+              - categoryId
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory'
+  /media/cloudinary/signature:
+    post:
+      tags:
+      - Media
+      summary: Get Cloudinary upload signature (server-side signed upload).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                folder:
+                  type: string
+      responses:
+        '200':
+          description: Signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudinaryUploadSignatureResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /articles/{id}/comments:
+    get:
+      tags:
+      - Engagement
+      security: []
+      summary: List comments for an article
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+    post:
+      tags:
+      - Engagement
+      summary: Add a comment (auth required).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+              required:
+              - body
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /articles/{id}/likes:
+    post:
+      tags:
+      - Engagement
+      summary: Like an article (auth required).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '201':
+          description: Liked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags:
+      - Engagement
+      summary: Unlike an article (auth required).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Unliked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /payments/paypal/create-order:
+    post:
+      tags:
+      - Payments
+      security: []
+      summary: Create a PayPal order for a donation/checkout.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaypalCreateOrderRequest'
+      responses:
+        '200':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaypalCreateOrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /payments/paypal/capture:
+    post:
+      tags:
+      - Payments
+      security: []
+      summary: Capture a PayPal order after approval.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaypalCaptureRequest'
+      responses:
+        '200':
+          description: Captured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaypalCaptureResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /payments/paypal/webhook:
+    post:
+      tags:
+      - Payments
+      security: []
+      summary: PayPal webhook receiver (verification performed server-side).
+      responses:
+        '200':
+          description: Received
+  /newsletter/subscribe:
+    post:
+      tags:
+      - Newsletter
+      security: []
+      summary: Subscribe an email to the newsletter.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+              - email
+      responses:
+        '201':
+          description: Subscribed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /newsletter/unsubscribe:
+    post:
+      tags:
+      - Newsletter
+      security: []
+      summary: Unsubscribe an email from the newsletter.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+              - email
+      responses:
+        '204':
+          description: Unsubscribed
+  /contact:
+    post:
+      tags:
+      - Contact
+      security: []
+      summary: Submit a contact form message.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactMessageRequest'
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          $ref: '#/components/responses/BadRequest'
