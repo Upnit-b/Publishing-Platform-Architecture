@@ -1,6 +1,6 @@
 # Architecture
 
-This document explains the platform architecture at a level that is **useful for recruiters/engineers** while keeping the production code and client IP private.
+This document explains the platform architecture while keeping the production code and client IP private.
 
 ---
 
@@ -14,8 +14,6 @@ This document explains the platform architecture at a level that is **useful for
 - **PayPal**: payment processing / verification
 - **Nginx**: reverse proxy on EC2 (single public entrypoint)
 
-See diagram: `diagrams/system-overview.mmd`.
-
 ---
 
 ## 2) Request flow
@@ -23,17 +21,17 @@ See diagram: `diagrams/system-overview.mmd`.
 ### Public browsing
 1. User hits `https://underthewraps.com/...`
 2. Nginx routes the request to the **Next.js** container.
-3. For data needs (articles, categories, images), the Next.js app calls the API at `/api/*`.
+3. For data needs (articles, categories, images), the Next.js app calls the backend API.
 
 ### API calls
-1. Browser → Nginx → Express `/api/*`
+1. Browser → Nginx → Express API
 2. Express validates request (rate limiting, auth middleware where required).
-3. Express uses **Prisma** to read/write to **Supabase Postgres**.
+3. Express uses database ORM to read/write to **Supabase Postgres**.
 
 ### Media uploads
 1. Client uploads an image to the API.
 2. API accepts multipart data (multer) and uploads to **Cloudinary**.
-3. API stores the resulting `url` + `publicId` (+ metadata like title/altText) in Postgres.
+3. API stores the resulting data (+ metadata like title/altText) in Postgres.
 
 ### Payments
 1. Client initiates PayPal checkout/donation.
@@ -60,8 +58,6 @@ Core entities:
 - `Comment` / `Like`
 - `Payment`
 - `Subscriber`
-
-See ERD diagram: `diagrams/erd.mmd`.
 
 ---
 

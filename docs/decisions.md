@@ -51,7 +51,5 @@ This document highlights the key decisions made to ship and operate the platform
 
 ## Next improvements (roadmap ideas)
 
-- Automated CI/CD pipeline (build, scan, deploy)
 - Zero-downtime deploy strategy (blue/green or rolling)
-- Centralized logs/metrics dashboards (e.g., CloudWatch + Sentry + Grafana)
 - Stronger caching strategy for high-traffic content

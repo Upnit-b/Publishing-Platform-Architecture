@@ -45,17 +45,13 @@ Blocked events are logged (IP + path) for investigation.
 ## 5) Secrets & credentials
 
 - Secrets are loaded from environment variables.
-- No secrets should be stored in Git.
-
-Recommended additions (if not already present):
-- `.env.example` templates
-- secret scanning in CI
+- No secrets stored in Git.
 
 ---
 
 ## 6) File upload safety (Cloudinary)
 
-Common safeguards:
+Common implemented safeguards:
 - validate MIME type and file size
 - store only Cloudinary URLs/public IDs in the database
 - avoid serving arbitrary local files
@@ -66,5 +62,3 @@ Common safeguards:
 
 - Role-based access control (`ADMIN` vs `USER`).
 - Protected API endpoints must validate session/auth.
-
-(Implementation details vary by environment; this case study describes the high-level approach.)

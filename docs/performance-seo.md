@@ -20,7 +20,7 @@ Images are stored and delivered via **Cloudinary**, enabling:
 - modern formats
 - CDN-backed delivery
 
-Recommended practices:
+Followed practices:
 - always provide alt text for accessibility and SEO
 - generate appropriately sized variants (avoid shipping huge originals)
 
@@ -49,7 +49,7 @@ Opportunities:
 
 ---
 
-## 6) What I would measure (recommended)
+## 6) Future Enhancements (recommended)
 
 - Lighthouse scores (Performance, Accessibility, SEO)
 - Core Web Vitals (LCP/CLS/INP)
